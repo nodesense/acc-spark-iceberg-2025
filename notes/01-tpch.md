@@ -32,3 +32,54 @@ part-suppliers:
 ps_partkey, ps_suppkey, ps_availqty, ps_supplycost, ps_comment
 
 ```
+
+SSH into master
+
+```
+hive
+```
+
+```
+CREATE DATABASE IF NOT EXISTS tpchive;
+```
+
+```
+CREATE EXTERNAL TABLE IF NOT EXISTS tpchive.regions (
+    r_regionkey INT,
+    r_name STRING,
+    r_comment STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION 'gs://tpch-source/regions/'
+TBLPROPERTIES ('skip.header.line.count'='1');
+
+```
+
+```
+SELECT * FROM tpchive.regions LIMIT 10;
+
+```
+
+while hive can understand skip.header.line.count, spark does not. run above query in spark.sql, see the row with column names as data.
+
+```
+DROP TABLE IF EXISTS tpchive.regions;
+```
+
+```
+CREATE EXTERNAL TABLE IF NOT EXISTS tpchive.regions (
+    r_regionkey INT,
+    r_name STRING,
+    r_comment STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+    "separatorChar" = ",",
+    "quoteChar"     = "\"",
+    "skip.header.line.count"="1"
+)
+STORED AS TEXTFILE
+LOCATION 'gs://tpch-source/regions/';
+```
