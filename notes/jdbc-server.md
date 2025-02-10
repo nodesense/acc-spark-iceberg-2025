@@ -59,3 +59,16 @@ beeline jdbc client
 
 beeline -u "jdbc:hive2://<<ip>>:10111/default"
 ```
+
+Big Query
+
+```
+
+CREATE TEMPORARY VIEW bq_movies
+USING bigquery
+OPTIONS (
+  table "iceberg-feb-20205.movies.moviest2"
+);
+
+SELECT * FROM bq_movies LIMIT 10;
+```
